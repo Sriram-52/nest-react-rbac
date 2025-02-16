@@ -1,0 +1,107 @@
+attribute @DtoReadOnly()
+attribute @DtoCreateHidden()
+attribute @DtoUpdateHidden()
+attribute @DtoEntityHidden()
+attribute @DtoApiHidden()
+attribute @DtoCreateOptional()
+attribute @DtoUpdateOptional()
+attribute @DtoRelationRequired()
+attribute @DtoRelationCanCreateOnCreate()
+attribute @DtoRelationCanConnectOnCreate()
+attribute @DtoRelationCanCreateOnUpdate()
+attribute @DtoRelationCanConnectOnUpdate()
+attribute @DtoRelationCanDisconnectOnUpdate()
+attribute @DtoRelationIncludeId()
+attribute @DtoTypeFullUpdate()
+
+datasource db {
+    provider = 'postgresql'
+    url = env('DATABASE_URL')
+}
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+generator nestjsDto {
+    provider                        = "prisma-generator-nestjs-dto"
+    output                          = "../src/prisma/models"
+    outputToNestJsResourceStructure = "false"
+    flatResourceStructure           = "false"
+    exportRelationModifierClasses   = "true"
+    reExport                        = "true"
+    createDtoPrefix                 = "Create"
+    updateDtoPrefix                 = "Update"
+    dtoSuffix                       = "Dto"
+    entityPrefix                    = ""
+    entitySuffix                    = ""
+    classValidation                 = "true"
+    fileNamingStyle                 = "camel"
+    noDependencies                  = "false"
+    outputType                      = "class"
+    definiteAssignmentAssertion     = "false"
+    requiredResponseApiProperty     = "true"
+    prettier                        = "true"
+}
+
+plugin prisma {
+    provider = '@core/prisma'
+    format = true
+    output = "./prisma/schema.prisma"
+    customAttributesAsComments = true
+}
+
+abstract model Base {
+    id        String   @id @default(cuid()) @DtoReadOnly
+    createdAt DateTime @default(now()) @map('created_at') @DtoCreateHidden @DtoUpdateHidden
+    updatedAt DateTime @updatedAt @map('updated_at') @DtoCreateHidden @DtoUpdateHidden
+    createdBy String?  @map('created_by') @default(auth().id) @DtoCreateHidden @DtoUpdateHidden
+    updatedBy String?  @map('updated_by') @default(auth().id) @DtoCreateHidden @DtoUpdateHidden
+
+    @@deny('all', auth() == null)
+    @@allow('all', true)
+}
+
+abstract model BaseWithTenant extends Base {
+    tenant   Tenant @relation(fields: [tenantId], references: [id])
+    tenantId String @map('tenant_id') @DtoCreateHidden @DtoUpdateHidden
+
+    @@deny('all', auth() == null)
+    @@allow('all', tenant.users?[user == auth()])
+}
+
+model Tenant extends Base {
+    name  String
+    slug  String       @unique
+    users TenantUser[] @DtoEntityHidden
+    posts Post[]       @DtoEntityHidden
+
+    @@map('tenant')
+}
+
+model User extends Base {
+    name    String       @length(1, 64)
+    email   String       @unique @email @length(6, 32)
+    posts   Post[]       @DtoEntityHidden
+    tenants TenantUser[] @DtoEntityHidden
+
+    @@map('user')
+}
+
+model TenantUser extends BaseWithTenant {
+    user   User   @relation(fields: [userId], references: [id])
+    userId String @map('user_id')
+
+    @@unique([tenantId, userId])
+    @@map('tenant_user')
+}
+
+model Post extends BaseWithTenant {
+    title     String  @length(1, 256)
+    content   String
+    published Boolean @default(false)
+    author    User    @relation(fields: [authorId], references: [id])
+    authorId  String  @map('author_id') @DtoRelationIncludeId
+
+    @@map('post')
+}

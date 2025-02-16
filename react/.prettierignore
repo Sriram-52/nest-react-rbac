@@ -1,0 +1,8 @@
+node_modules
+dist
+.yarn
+.vscode
+.nx
+*.json
+*.cjs
+/.nx/cache
