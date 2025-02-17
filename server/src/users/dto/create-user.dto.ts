@@ -4,4 +4,7 @@ import { IsString } from 'class-validator';
 export class CreateUserDto extends Base {
   @IsString()
   password: string;
+
+  @IsString()
+  tenantId: string;
 }

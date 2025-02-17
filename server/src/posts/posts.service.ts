@@ -1,13 +1,13 @@
-import { Injectable } from '@nestjs/common';
-import { CreatePostDto, PostDto, UpdatePostDto } from '@/prisma/models';
-import { PrismaService } from '@/prisma/prisma.service';
+import { Inject, Injectable } from '@nestjs/common';
+import { CreatePostDto, PostDto, PrismaService, UpdatePostDto } from '@/prisma';
 import { plainToInstance } from 'class-transformer';
 import { ClsService } from 'nestjs-cls';
+import { ENHANCED_PRISMA } from '@zenstackhq/server/nestjs';
 
 @Injectable()
 export class PostsService {
   constructor(
-    private readonly prisma: PrismaService,
+    @Inject(ENHANCED_PRISMA) private readonly prisma: PrismaService,
     private readonly clsService: ClsService,
   ) {}
 

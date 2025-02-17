@@ -28,12 +28,11 @@ export class AuthGuard implements CanActivate {
       }
 
       const token = request.headers.authorization?.split('Bearer ').pop();
-      const tenantId = request.headers['x-tenant-id'];
-      if (!token || !tenantId) {
-        throw new UnauthorizedException('No token or tenant provided');
+      if (!token) {
+        throw new UnauthorizedException('No token provided');
       }
 
-      const user = await this.authService.validateToken(token, tenantId);
+      const user = await this.authService.validateToken(token);
       request.user = user;
       if (!user) {
         throw new UnauthorizedException('Invalid token');

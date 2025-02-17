@@ -1,15 +1,18 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { UpdateUserDto, UserDto } from '@/prisma/models';
-import { PrismaService, RawPrismaService } from '@/prisma/prisma.service';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { UpdateUserDto, User, UserDto } from '@/prisma/models';
+import { PrismaService } from '@/prisma/prisma.service';
 import { auth } from 'firebase-admin';
 import { CreateUserDto } from './dto/create-user.dto';
 import { plainToInstance } from 'class-transformer';
+import { ClsService } from 'nestjs-cls';
+import { ENHANCED_PRISMA } from '@zenstackhq/server/nestjs';
 
 @Injectable()
 export class UsersService {
   constructor(
-    private readonly prisma: PrismaService,
-    private readonly rawPrisma: RawPrismaService,
+    @Inject(ENHANCED_PRISMA) private readonly prisma: PrismaService,
+    private readonly rawPrisma: PrismaService,
+    private readonly clsService: ClsService,
   ) {}
 
   private async isEmailTaken(email: string) {
@@ -36,14 +39,31 @@ export class UsersService {
       password: createUserDto.password,
       displayName: createUserDto.name,
     });
-    const user = await this.rawPrisma.user.create({
-      data: {
-        id: fbUser.uid,
-        email: createUserDto.email,
-        name: createUserDto.name,
-      },
-    });
-    return plainToInstance(UserDto, user);
+    try {
+      const user = await this.rawPrisma.$transaction(
+        async (tx) => {
+          const user = await tx.user.create({
+            data: {
+              id: fbUser.uid,
+              email: createUserDto.email,
+              name: createUserDto.name,
+            },
+          });
+          await tx.tenantUser.create({
+            data: {
+              tenantId: createUserDto.tenantId,
+              userId: user.id,
+            },
+          });
+          return user;
+        },
+        { timeout: 20000 },
+      );
+      return plainToInstance(UserDto, user);
+    } catch (error) {
+      await auth().deleteUser(fbUser.uid);
+      throw error;
+    }
   }
 
   async findAll() {
@@ -52,6 +72,19 @@ export class UsersService {
       .then((tenantUser) => tenantUser.map((tu) => tu.user));
 
     return plainToInstance(UserDto, result);
+  }
+
+  async findMe() {
+    const user = this.clsService.get<User>('auth');
+    const result = await this.rawPrisma.user.findUnique({
+      where: {
+        id: user.id,
+      },
+      include: {
+        tenants: true,
+      },
+    });
+    return plainToInstance(User, result);
   }
 
   async findOne(id: string) {

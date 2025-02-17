@@ -9,6 +9,7 @@ import { z as zod } from "zod";
 export const postsControllerCreateBody = zod.object({
 	title: zod.string(),
 	content: zod.string(),
+	published: zod.boolean().optional(),
 	authorId: zod.string(),
 });
 
@@ -48,6 +49,7 @@ export const postsControllerUpdateParams = zod.object({
 export const postsControllerUpdateBody = zod.object({
 	title: zod.string().optional(),
 	content: zod.string().optional(),
+	published: zod.boolean().optional(),
 	authorId: zod.string().optional(),
 });
 

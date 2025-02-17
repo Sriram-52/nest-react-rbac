@@ -1,23 +1,16 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { ExtendedPrismaClient, RawPrismaClient } from './extend-prisma.client';
-import { Prisma } from '@prisma/client';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { Prisma, PrismaClient } from '@prisma/client';
 
 @Injectable()
-export class PrismaService extends ExtendedPrismaClient {
+export class PrismaService extends PrismaClient implements OnModuleInit {
   private readonly logger = new Logger(PrismaService.name);
 
   constructor() {
-    super();
-    this.logger.log(`Prisma v${Prisma.prismaVersion.client} initialized`);
+    super({ log: ['info'] });
   }
-}
 
-@Injectable()
-export class RawPrismaService extends RawPrismaClient {
-  private readonly logger = new Logger(RawPrismaService.name);
-
-  constructor() {
-    super();
-    this.logger.log(`Raw Prisma v${Prisma.prismaVersion.client} initialized`);
+  async onModuleInit() {
+    await this.$connect();
+    this.logger.log('Connected to Database');
   }
 }

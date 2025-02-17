@@ -1,4 +1,4 @@
-import { PrismaService } from '@/prisma/prisma.service';
+import { PrismaService } from '@/prisma';
 import { Injectable, Logger } from '@nestjs/common';
 import { auth } from 'firebase-admin';
 
@@ -8,20 +8,14 @@ export class AuthService {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  async validateToken(token: string, tenantId: string) {
+  async validateToken(token: string) {
     try {
       const decodedToken = await auth().verifyIdToken(token);
       const user = await this.prisma.user.findUnique({
         where: {
-          email: decodedToken.email,
-          tenants: {
-            some: { id: tenantId },
-          },
+          id: decodedToken.uid,
         },
       });
-      if (!user) {
-        return null;
-      }
       return user;
     } catch (error) {
       this.logger.error(error);

@@ -8,5 +8,6 @@
 export interface CreatePostDto {
 	title: string;
 	content: string;
+	published?: boolean;
 	authorId: string;
 }

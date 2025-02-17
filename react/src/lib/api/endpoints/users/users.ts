@@ -22,6 +22,7 @@ import type {
 	CreateUserDto,
 	SuccessResponseDto,
 	UpdateUserDto,
+	User,
 	UserDto,
 	UsersControllerCreate201,
 	UsersControllerUpdate200,
@@ -200,6 +201,109 @@ export function useUsersControllerFindAll<
 	request?: SecondParameter<typeof http>;
 }): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 	const queryOptions = getUsersControllerFindAllQueryOptions(options);
+
+	const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+		queryKey: DataTag<QueryKey, TData, TError>;
+	};
+
+	query.queryKey = queryOptions.queryKey;
+
+	return query;
+}
+
+export const usersControllerFindMe = (
+	options?: SecondParameter<typeof http>,
+	signal?: AbortSignal,
+) => {
+	return http<User>({ url: `/api/users/me`, method: "GET", signal }, options);
+};
+
+export const getUsersControllerFindMeQueryKey = () => {
+	return [`/api/users/me`] as const;
+};
+
+export const getUsersControllerFindMeQueryOptions = <
+	TData = Awaited<ReturnType<typeof usersControllerFindMe>>,
+	TError = unknown,
+>(options?: {
+	query?: Partial<
+		UseQueryOptions<Awaited<ReturnType<typeof usersControllerFindMe>>, TError, TData>
+	>;
+	request?: SecondParameter<typeof http>;
+}) => {
+	const { query: queryOptions, request: requestOptions } = options ?? {};
+
+	const queryKey = queryOptions?.queryKey ?? getUsersControllerFindMeQueryKey();
+
+	const queryFn: QueryFunction<Awaited<ReturnType<typeof usersControllerFindMe>>> = ({ signal }) =>
+		usersControllerFindMe(requestOptions, signal);
+
+	return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+		Awaited<ReturnType<typeof usersControllerFindMe>>,
+		TError,
+		TData
+	> & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type UsersControllerFindMeQueryResult = NonNullable<
+	Awaited<ReturnType<typeof usersControllerFindMe>>
+>;
+export type UsersControllerFindMeQueryError = unknown;
+
+export function useUsersControllerFindMe<
+	TData = Awaited<ReturnType<typeof usersControllerFindMe>>,
+	TError = unknown,
+>(options: {
+	query: Partial<
+		UseQueryOptions<Awaited<ReturnType<typeof usersControllerFindMe>>, TError, TData>
+	> &
+		Pick<
+			DefinedInitialDataOptions<
+				Awaited<ReturnType<typeof usersControllerFindMe>>,
+				TError,
+				Awaited<ReturnType<typeof usersControllerFindMe>>
+			>,
+			"initialData"
+		>;
+	request?: SecondParameter<typeof http>;
+}): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useUsersControllerFindMe<
+	TData = Awaited<ReturnType<typeof usersControllerFindMe>>,
+	TError = unknown,
+>(options?: {
+	query?: Partial<
+		UseQueryOptions<Awaited<ReturnType<typeof usersControllerFindMe>>, TError, TData>
+	> &
+		Pick<
+			UndefinedInitialDataOptions<
+				Awaited<ReturnType<typeof usersControllerFindMe>>,
+				TError,
+				Awaited<ReturnType<typeof usersControllerFindMe>>
+			>,
+			"initialData"
+		>;
+	request?: SecondParameter<typeof http>;
+}): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useUsersControllerFindMe<
+	TData = Awaited<ReturnType<typeof usersControllerFindMe>>,
+	TError = unknown,
+>(options?: {
+	query?: Partial<
+		UseQueryOptions<Awaited<ReturnType<typeof usersControllerFindMe>>, TError, TData>
+	>;
+	request?: SecondParameter<typeof http>;
+}): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+export function useUsersControllerFindMe<
+	TData = Awaited<ReturnType<typeof usersControllerFindMe>>,
+	TError = unknown,
+>(options?: {
+	query?: Partial<
+		UseQueryOptions<Awaited<ReturnType<typeof usersControllerFindMe>>, TError, TData>
+	>;
+	request?: SecondParameter<typeof http>;
+}): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+	const queryOptions = getUsersControllerFindMeQueryOptions(options);
 
 	const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
 		queryKey: DataTag<QueryKey, TData, TError>;

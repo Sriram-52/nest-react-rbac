@@ -8,5 +8,6 @@
 export interface UpdatePostDto {
 	title?: string;
 	content?: string;
+	published?: boolean;
 	authorId?: string;
 }

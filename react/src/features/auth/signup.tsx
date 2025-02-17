@@ -12,12 +12,11 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { Link } from "react-router-dom";
-import { useUsersControllerCreate } from "@/lib/api";
+import { usersControllerCreateBody, useUsersControllerCreate } from "@/lib/api";
+import { environment } from "@/lib/environment";
 
-const signupSchema = z
-	.object({
-		name: z.string().min(2, { message: "Name must be at least 2 characters" }),
-		email: z.string().email({ message: "Invalid email address" }),
+const signupSchema = usersControllerCreateBody
+	.extend({
 		password: z.string().min(6, { message: "Password must be at least 6 characters" }),
 		confirmPassword: z.string().min(6, { message: "Password must be at least 6 characters" }),
 	})
@@ -35,6 +34,7 @@ export default function SignupForm() {
 			name: "",
 			email: "",
 			password: "",
+			tenantId: environment.defaultTenantId,
 		},
 	});
 

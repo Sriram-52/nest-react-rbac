@@ -1,21 +1,18 @@
 import axios from "axios";
 import { LoaderService } from "./services/loader.service";
-import { useTenantStore } from "./store/tenant";
 import { toast } from "@/hooks/use-toast";
 import { environment } from "./environment";
+import { getAuth } from "firebase/auth";
+import { firebaseApp } from "./environment/firebase-config";
 
 class InterceptorService {
-	private authTokenGetter: () => Promise<string | null> = () => Promise.resolve(null);
-	private _userId: string | null = null;
-
-	setAuthTokenGetter(arg0: (() => Promise<string | null>) | undefined) {
-		if (arg0) {
-			this.authTokenGetter = arg0;
+	private async authTokenGetter() {
+		const auth = getAuth(firebaseApp);
+		const user = auth.currentUser;
+		if (user) {
+			return user.getIdToken();
 		}
-	}
-
-	setUserId(arg0: string | null) {
-		this._userId = arg0;
+		return null;
 	}
 
 	addRequestInterceptor(): this {
@@ -28,12 +25,7 @@ class InterceptorService {
 				if (token) {
 					config.headers.Authorization = `Bearer ${token}`;
 				}
-				if (this._userId) {
-					config.headers["x-user-id"] = this._userId;
-				}
-				if (useTenantStore.getState().selectedTenantId) {
-					config.headers["x-tenant-id"] = useTenantStore.getState().selectedTenantId;
-				}
+				config.headers["x-tenant-id"] = environment.defaultTenantId;
 				return config;
 			},
 			(error) => {

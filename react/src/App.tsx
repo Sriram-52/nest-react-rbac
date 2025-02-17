@@ -3,7 +3,7 @@ import router from "./router";
 import { useEffect, useRef, useState } from "react";
 import { useLoaderStore } from "./lib/store/loader";
 import { LoadingOverlay } from "./components/ui/loading-overlay";
-import { useAuth } from "./lib/providers/AuthProvider";
+import { useAuth } from "./lib/providers/auth-provider";
 import LoadingSpinner from "./components/ui/loading-spinner";
 import UnauthLayout from "./layout/unauth-layout";
 import AuthLayout from "./layout/auth-layout";

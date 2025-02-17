@@ -59,14 +59,12 @@ abstract model Base {
     updatedBy String?  @map('updated_by') @default(auth().id) @DtoCreateHidden @DtoUpdateHidden
 
     @@deny('all', auth() == null)
-    @@allow('all', true)
 }
 
 abstract model BaseWithTenant extends Base {
     tenant   Tenant @relation(fields: [tenantId], references: [id])
     tenantId String @map('tenant_id') @DtoCreateHidden @DtoUpdateHidden
 
-    @@deny('all', auth() == null)
     @@allow('all', tenant.users?[user == auth()])
 }
 
@@ -83,7 +81,7 @@ model User extends Base {
     name    String       @length(1, 64)
     email   String       @unique @email @length(6, 32)
     posts   Post[]       @DtoEntityHidden
-    tenants TenantUser[] @DtoEntityHidden
+    tenants TenantUser[]
 
     @@map('user')
 }
@@ -99,7 +97,7 @@ model TenantUser extends BaseWithTenant {
 model Post extends BaseWithTenant {
     title     String  @length(1, 256)
     content   String
-    published Boolean @default(false)
+    published Boolean @default(false) @DtoCreateOptional @DtoUpdateOptional
     author    User    @relation(fields: [authorId], references: [id])
     authorId  String  @map('author_id') @DtoRelationIncludeId
 

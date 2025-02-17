@@ -1,9 +1,14 @@
-import { NestFactory, Reflector } from '@nestjs/core';
+import { HttpAdapterHost, NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import * as admin from 'firebase-admin';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { AuthGuard, AuthService, SuccessResponseDto } from './common';
+import {
+  AllExceptionsFilter,
+  AuthGuard,
+  AuthService,
+  SuccessResponseDto,
+} from './common';
 
 function initializeFirebase() {
   const logger = new Logger('Firebase');
@@ -36,6 +41,9 @@ async function bootstrap() {
   const reflector = app.get(Reflector);
   const authService = app.get(AuthService);
   app.useGlobalGuards(new AuthGuard(reflector, authService));
+
+  const { httpAdapter } = app.get(HttpAdapterHost);
+  app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
 
   const config = new DocumentBuilder()
     .setTitle('Nest React RBAC API')

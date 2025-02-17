@@ -34,7 +34,6 @@ generator nestjsDto {
 }
 
 /// @@deny('all', auth() == null)
-/// @@allow('all', true)
 model Tenant {
   /// @DtoReadOnly
   id        String       @id() @default(cuid())
@@ -61,7 +60,6 @@ model Tenant {
 }
 
 /// @@deny('all', auth() == null)
-/// @@allow('all', true)
 model User {
   /// @DtoReadOnly
   id        String       @id() @default(cuid())
@@ -84,14 +82,11 @@ model User {
   email     String       @unique()
   /// @DtoEntityHidden
   posts     Post[]
-  /// @DtoEntityHidden
   tenants   TenantUser[]
 
   @@map("user")
 }
 
-/// @@deny('all', auth() == null)
-/// @@allow('all', true)
 /// @@deny('all', auth() == null)
 /// @@allow('all', tenant.users?[user == auth()])
 model TenantUser {
@@ -121,8 +116,6 @@ model TenantUser {
 }
 
 /// @@deny('all', auth() == null)
-/// @@allow('all', true)
-/// @@deny('all', auth() == null)
 /// @@allow('all', tenant.users?[user == auth()])
 model Post {
   /// @DtoReadOnly
@@ -146,6 +139,8 @@ model Post {
   /// @length(1, 256)
   title     String
   content   String
+  /// @DtoCreateOptional
+  /// @DtoUpdateOptional
   published Boolean  @default(false)
   author    User     @relation(fields: [authorId], references: [id])
   /// @DtoRelationIncludeId

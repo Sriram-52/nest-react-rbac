@@ -2,8 +2,6 @@ import { FirebaseError } from "firebase/app";
 import { AuthErrorCodes, User, getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { firebaseApp } from "../environment/firebase-config";
-import { useTenantStore } from "../store/tenant";
-import { interceptor } from "../interceptor";
 
 interface AuthContext {
 	user: User | null;
@@ -27,25 +25,6 @@ const auth = getAuth(firebaseApp);
 export default function AuthProvider({ children }: Readonly<{ children: React.ReactNode }>) {
 	const [user, setUser] = useState<User | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
-	const { setSelectedTenantId } = useTenantStore();
-
-	const getAccessTokenSilently = useCallback(async () => {
-		const user = auth.currentUser;
-		if (user) {
-			const token = await user.getIdToken();
-			return token;
-		}
-		return null;
-	}, []);
-
-	useEffect(() => {
-		if (!user) {
-			interceptor.setAuthTokenGetter(undefined);
-			return;
-		}
-		interceptor.setAuthTokenGetter(getAccessTokenSilently);
-		return () => interceptor.setAuthTokenGetter(undefined);
-	}, [user, getAccessTokenSilently]);
 
 	const onAuthStateChanged = useCallback((authUser: User | null) => {
 		if (authUser) {
@@ -92,13 +71,12 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
 
 	const signOut = useCallback(async () => {
 		try {
-			setSelectedTenantId(null);
 			await auth.signOut();
 			setUser(null);
 		} catch (error) {
 			console.error(error);
 		}
-	}, [setSelectedTenantId]);
+	}, []);
 
 	const value = useMemo(
 		() => ({

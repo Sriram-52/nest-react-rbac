@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreatePostDto {
   @ApiProperty({
@@ -14,6 +14,14 @@ export class CreatePostDto {
   @IsNotEmpty()
   @IsString()
   content: string;
+  @ApiProperty({
+    type: 'boolean',
+    default: false,
+    required: false,
+  })
+  @IsOptional()
+  @IsBoolean()
+  published?: boolean;
   @ApiProperty({
     type: 'string',
   })

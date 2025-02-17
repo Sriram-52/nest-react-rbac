@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -13,7 +12,7 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { Link } from "react-router-dom";
-import { useAuth } from "@/lib/providers/AuthProvider";
+import { useAuth } from "@/lib/providers/auth-provider";
 import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 

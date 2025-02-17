@@ -10,6 +10,7 @@ export const usersControllerCreateBody = zod.object({
 	name: zod.string(),
 	email: zod.string(),
 	password: zod.string(),
+	tenantId: zod.string(),
 });
 
 export const usersControllerFindAllResponseItem = zod.object({
@@ -22,6 +23,41 @@ export const usersControllerFindAllResponseItem = zod.object({
 	email: zod.string(),
 });
 export const usersControllerFindAllResponse = zod.array(usersControllerFindAllResponseItem);
+
+export const usersControllerFindMeResponse = zod.object({
+	id: zod.string(),
+	createdAt: zod.string().datetime(),
+	updatedAt: zod.string().datetime(),
+	createdBy: zod.string().nullable(),
+	updatedBy: zod.string().nullable(),
+	name: zod.string(),
+	email: zod.string(),
+	tenants: zod
+		.array(
+			zod.object({
+				id: zod.string(),
+				createdAt: zod.string().datetime(),
+				updatedAt: zod.string().datetime(),
+				createdBy: zod.string().nullable(),
+				updatedBy: zod.string().nullable(),
+				tenant: zod
+					.object({
+						id: zod.string(),
+						createdAt: zod.string().datetime(),
+						updatedAt: zod.string().datetime(),
+						createdBy: zod.string().nullable(),
+						updatedBy: zod.string().nullable(),
+						name: zod.string(),
+						slug: zod.string(),
+					})
+					.optional(),
+				tenantId: zod.string(),
+				user: zod.any().optional(),
+				userId: zod.string(),
+			}),
+		)
+		.optional(),
+});
 
 export const usersControllerFindOneParams = zod.object({
 	id: zod.string(),

@@ -1,4 +1,3 @@
-import { createBrowserRouter, Navigate, RouteObject } from "react-router-dom";
 import { lazy, LazyExoticComponent } from "react";
 
 type Route = {
@@ -13,6 +12,8 @@ const publicRoutes: Route[] = [
 
 const privateRoutes: Route[] = [
 	{ path: "/", Component: lazy(() => import("./features/posts/posts-list")) },
+	{ path: "/create-post", Component: lazy(() => import("./features/posts/create-post")) },
+	{ path: "/edit-post/:id", Component: lazy(() => import("./features/posts/update-post")) },
 ];
 
 export default {
