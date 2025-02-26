@@ -20,6 +20,7 @@ import type {
 } from "@tanstack/react-query";
 import type {
 	CreatePostDto,
+	Post,
 	PostDto,
 	PostsControllerCreate201,
 	PostsControllerUpdate200,
@@ -107,99 +108,99 @@ export const usePostsControllerCreate = <TError = unknown, TContext = unknown>(o
 
 	return useMutation(mutationOptions);
 };
-export const postsControllerIndAll = (
+export const postsControllerFindAll = (
 	options?: SecondParameter<typeof http>,
 	signal?: AbortSignal,
 ) => {
-	return http<PostDto[]>({ url: `/api/posts`, method: "GET", signal }, options);
+	return http<Post[]>({ url: `/api/posts`, method: "GET", signal }, options);
 };
 
-export const getPostsControllerIndAllQueryKey = () => {
+export const getPostsControllerFindAllQueryKey = () => {
 	return [`/api/posts`] as const;
 };
 
-export const getPostsControllerIndAllQueryOptions = <
-	TData = Awaited<ReturnType<typeof postsControllerIndAll>>,
+export const getPostsControllerFindAllQueryOptions = <
+	TData = Awaited<ReturnType<typeof postsControllerFindAll>>,
 	TError = unknown,
 >(options?: {
 	query?: Partial<
-		UseQueryOptions<Awaited<ReturnType<typeof postsControllerIndAll>>, TError, TData>
+		UseQueryOptions<Awaited<ReturnType<typeof postsControllerFindAll>>, TError, TData>
 	>;
 	request?: SecondParameter<typeof http>;
 }) => {
 	const { query: queryOptions, request: requestOptions } = options ?? {};
 
-	const queryKey = queryOptions?.queryKey ?? getPostsControllerIndAllQueryKey();
+	const queryKey = queryOptions?.queryKey ?? getPostsControllerFindAllQueryKey();
 
-	const queryFn: QueryFunction<Awaited<ReturnType<typeof postsControllerIndAll>>> = ({ signal }) =>
-		postsControllerIndAll(requestOptions, signal);
+	const queryFn: QueryFunction<Awaited<ReturnType<typeof postsControllerFindAll>>> = ({ signal }) =>
+		postsControllerFindAll(requestOptions, signal);
 
 	return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-		Awaited<ReturnType<typeof postsControllerIndAll>>,
+		Awaited<ReturnType<typeof postsControllerFindAll>>,
 		TError,
 		TData
 	> & { queryKey: DataTag<QueryKey, TData, TError> };
 };
 
-export type PostsControllerIndAllQueryResult = NonNullable<
-	Awaited<ReturnType<typeof postsControllerIndAll>>
+export type PostsControllerFindAllQueryResult = NonNullable<
+	Awaited<ReturnType<typeof postsControllerFindAll>>
 >;
-export type PostsControllerIndAllQueryError = unknown;
+export type PostsControllerFindAllQueryError = unknown;
 
-export function usePostsControllerIndAll<
-	TData = Awaited<ReturnType<typeof postsControllerIndAll>>,
+export function usePostsControllerFindAll<
+	TData = Awaited<ReturnType<typeof postsControllerFindAll>>,
 	TError = unknown,
 >(options: {
 	query: Partial<
-		UseQueryOptions<Awaited<ReturnType<typeof postsControllerIndAll>>, TError, TData>
+		UseQueryOptions<Awaited<ReturnType<typeof postsControllerFindAll>>, TError, TData>
 	> &
 		Pick<
 			DefinedInitialDataOptions<
-				Awaited<ReturnType<typeof postsControllerIndAll>>,
+				Awaited<ReturnType<typeof postsControllerFindAll>>,
 				TError,
-				Awaited<ReturnType<typeof postsControllerIndAll>>
+				Awaited<ReturnType<typeof postsControllerFindAll>>
 			>,
 			"initialData"
 		>;
 	request?: SecondParameter<typeof http>;
 }): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function usePostsControllerIndAll<
-	TData = Awaited<ReturnType<typeof postsControllerIndAll>>,
+export function usePostsControllerFindAll<
+	TData = Awaited<ReturnType<typeof postsControllerFindAll>>,
 	TError = unknown,
 >(options?: {
 	query?: Partial<
-		UseQueryOptions<Awaited<ReturnType<typeof postsControllerIndAll>>, TError, TData>
+		UseQueryOptions<Awaited<ReturnType<typeof postsControllerFindAll>>, TError, TData>
 	> &
 		Pick<
 			UndefinedInitialDataOptions<
-				Awaited<ReturnType<typeof postsControllerIndAll>>,
+				Awaited<ReturnType<typeof postsControllerFindAll>>,
 				TError,
-				Awaited<ReturnType<typeof postsControllerIndAll>>
+				Awaited<ReturnType<typeof postsControllerFindAll>>
 			>,
 			"initialData"
 		>;
 	request?: SecondParameter<typeof http>;
 }): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function usePostsControllerIndAll<
-	TData = Awaited<ReturnType<typeof postsControllerIndAll>>,
+export function usePostsControllerFindAll<
+	TData = Awaited<ReturnType<typeof postsControllerFindAll>>,
 	TError = unknown,
 >(options?: {
 	query?: Partial<
-		UseQueryOptions<Awaited<ReturnType<typeof postsControllerIndAll>>, TError, TData>
+		UseQueryOptions<Awaited<ReturnType<typeof postsControllerFindAll>>, TError, TData>
 	>;
 	request?: SecondParameter<typeof http>;
 }): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-export function usePostsControllerIndAll<
-	TData = Awaited<ReturnType<typeof postsControllerIndAll>>,
+export function usePostsControllerFindAll<
+	TData = Awaited<ReturnType<typeof postsControllerFindAll>>,
 	TError = unknown,
 >(options?: {
 	query?: Partial<
-		UseQueryOptions<Awaited<ReturnType<typeof postsControllerIndAll>>, TError, TData>
+		UseQueryOptions<Awaited<ReturnType<typeof postsControllerFindAll>>, TError, TData>
 	>;
 	request?: SecondParameter<typeof http>;
 }): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-	const queryOptions = getPostsControllerIndAllQueryOptions(options);
+	const queryOptions = getPostsControllerFindAllQueryOptions(options);
 
 	const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
 		queryKey: DataTag<QueryKey, TData, TError>;

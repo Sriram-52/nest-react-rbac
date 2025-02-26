@@ -6,6 +6,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { plainToInstance } from 'class-transformer';
 import { ClsService } from 'nestjs-cls';
 import { ENHANCED_PRISMA } from '@zenstackhq/server/nestjs';
+import { UsersAbilityService } from './users-ability.service';
+import { accessibleBy } from '@casl/prisma';
 
 @Injectable()
 export class UsersService {
@@ -13,6 +15,7 @@ export class UsersService {
     @Inject(ENHANCED_PRISMA) private readonly prisma: PrismaService,
     private readonly rawPrisma: PrismaService,
     private readonly clsService: ClsService,
+    private readonly ability: UsersAbilityService,
   ) {}
 
   private async isEmailTaken(email: string) {
@@ -68,23 +71,19 @@ export class UsersService {
 
   async findAll() {
     const result = await this.prisma.tenantUser
-      .findMany({ include: { user: true } })
+      .findMany({
+        where: {
+          user: accessibleBy(this.clsService.get('ability')).User,
+        },
+        include: { user: true },
+      })
       .then((tenantUser) => tenantUser.map((tu) => tu.user));
 
     return plainToInstance(UserDto, result);
   }
 
-  async findMe() {
-    const user = this.clsService.get<User>('auth');
-    const result = await this.rawPrisma.user.findUnique({
-      where: {
-        id: user.id,
-      },
-      include: {
-        tenants: true,
-      },
-    });
-    return plainToInstance(User, result);
+  findMe() {
+    return plainToInstance(User, this.clsService.get('auth'));
   }
 
   async findOne(id: string) {
@@ -93,18 +92,36 @@ export class UsersService {
         id,
       },
     });
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+    this.ability.canRead(user);
     return plainToInstance(UserDto, user);
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
-    const user = await this.prisma.user.update({
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+    });
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+    this.ability.canUpdate(user);
+    const result = await this.prisma.user.update({
       where: { id },
       data: updateUserDto,
     });
-    return plainToInstance(UserDto, user);
+    return plainToInstance(UserDto, result);
   }
 
   async remove(id: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+    });
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+    this.ability.canDelete(user);
     await this.prisma.user.delete({
       where: { id },
     });

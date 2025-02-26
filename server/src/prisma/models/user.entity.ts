@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { TenantUser } from './tenantUser.entity';
+import { RoleUser } from './roleUser.entity';
 
 export class User {
   @ApiProperty({
@@ -40,4 +41,10 @@ export class User {
     required: false,
   })
   tenants?: TenantUser[];
+  @ApiProperty({
+    type: () => RoleUser,
+    isArray: true,
+    required: false,
+  })
+  roles?: RoleUser[];
 }

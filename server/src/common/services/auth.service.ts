@@ -15,6 +15,21 @@ export class AuthService {
         where: {
           id: decodedToken.uid,
         },
+        include: {
+          roles: {
+            include: {
+              role: {
+                include: {
+                  permissions: {
+                    include: {
+                      permission: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
       });
       return user;
     } catch (error) {

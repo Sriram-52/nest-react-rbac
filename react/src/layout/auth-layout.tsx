@@ -7,7 +7,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/lib/providers/auth-provider";
-import { LogOut, UserCircle } from "lucide-react";
+import { LogOut, Shield, UserCircle } from "lucide-react";
 import { ReactNode } from "react";
 import { Link } from "react-router-dom";
 
@@ -36,7 +36,21 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
 										</Avatar>
 									</Button>
 								</DropdownMenuTrigger>
+								{/* <DropdownMenuContent align="end">
+									<Link to="/manage-roles">
+										<DropdownMenuItem onClick={signOut}>
+											<LogOut className="mr-2 h-4 w-4" />
+											<span>Manage Roles</span>
+										</DropdownMenuItem>
+									</Link>
+								</DropdownMenuContent> */}
 								<DropdownMenuContent align="end">
+									<Link to="/manage-roles">
+										<DropdownMenuItem>
+											<Shield className="mr-2 h-4 w-4" />
+											<span>Manage Roles</span>
+										</DropdownMenuItem>
+									</Link>
 									<DropdownMenuItem onClick={signOut}>
 										<LogOut className="mr-2 h-4 w-4" />
 										<span>Log out</span>

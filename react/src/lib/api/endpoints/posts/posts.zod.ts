@@ -13,18 +13,101 @@ export const postsControllerCreateBody = zod.object({
 	authorId: zod.string(),
 });
 
-export const postsControllerIndAllResponseItem = zod.object({
+export const postsControllerFindAllResponseItem = zod.object({
 	id: zod.string(),
 	createdAt: zod.string().datetime(),
 	updatedAt: zod.string().datetime(),
 	createdBy: zod.string().nullable(),
 	updatedBy: zod.string().nullable(),
+	tenantId: zod.string(),
 	title: zod.string(),
 	content: zod.string(),
 	published: zod.boolean(),
+	author: zod
+		.object({
+			id: zod.string(),
+			createdAt: zod.string().datetime(),
+			updatedAt: zod.string().datetime(),
+			createdBy: zod.string().nullable(),
+			updatedBy: zod.string().nullable(),
+			name: zod.string(),
+			email: zod.string(),
+			tenants: zod
+				.array(
+					zod.object({
+						id: zod.string(),
+						createdAt: zod.string().datetime(),
+						updatedAt: zod.string().datetime(),
+						createdBy: zod.string().nullable(),
+						updatedBy: zod.string().nullable(),
+						tenantId: zod.string(),
+						user: zod.any().optional(),
+						userId: zod.string(),
+					}),
+				)
+				.optional(),
+			roles: zod
+				.array(
+					zod.object({
+						id: zod.string(),
+						createdAt: zod.string().datetime(),
+						updatedAt: zod.string().datetime(),
+						createdBy: zod.string().nullable(),
+						updatedBy: zod.string().nullable(),
+						role: zod
+							.object({
+								id: zod.string(),
+								createdAt: zod.string().datetime(),
+								updatedAt: zod.string().datetime(),
+								createdBy: zod.string().nullable(),
+								updatedBy: zod.string().nullable(),
+								tenantId: zod.string(),
+								name: zod.string(),
+								description: zod.string().nullable(),
+								permissions: zod
+									.array(
+										zod.object({
+											id: zod.string(),
+											createdAt: zod.string().datetime(),
+											updatedAt: zod.string().datetime(),
+											createdBy: zod.string().nullable(),
+											updatedBy: zod.string().nullable(),
+											role: zod.any().optional(),
+											roleId: zod.string(),
+											permission: zod
+												.object({
+													id: zod.string(),
+													createdAt: zod.string().datetime(),
+													updatedAt: zod.string().datetime(),
+													createdBy: zod.string().nullable(),
+													updatedBy: zod.string().nullable(),
+													action: zod.string(),
+													subject: zod.string(),
+													fields: zod.array(zod.string()),
+													conditions: zod.object({}).nullable(),
+													inverted: zod.boolean(),
+													reason: zod.string().nullable(),
+													roles: zod.array(zod.any()).optional(),
+												})
+												.optional(),
+											permissionId: zod.string(),
+										}),
+									)
+									.optional(),
+								users: zod.array(zod.any()).optional(),
+							})
+							.optional(),
+						roleId: zod.string(),
+						user: zod.any().optional(),
+						userId: zod.string(),
+					}),
+				)
+				.optional(),
+		})
+		.optional(),
 	authorId: zod.string(),
 });
-export const postsControllerIndAllResponse = zod.array(postsControllerIndAllResponseItem);
+export const postsControllerFindAllResponse = zod.array(postsControllerFindAllResponseItem);
 
 export const postsControllerFindOneParams = zod.object({
 	id: zod.string(),

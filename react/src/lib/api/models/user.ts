@@ -5,6 +5,7 @@
  * OpenAPI spec version: 1.0
  */
 import type { TenantUser } from "./tenantUser";
+import type { RoleUser } from "./roleUser";
 
 export interface User {
 	id: string;
@@ -17,4 +18,5 @@ export interface User {
 	name: string;
 	email: string;
 	tenants?: TenantUser[];
+	roles?: RoleUser[];
 }

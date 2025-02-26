@@ -7,8 +7,11 @@ import {
   AllExceptionsFilter,
   AuthGuard,
   AuthService,
+  PermissionGuard,
   SuccessResponseDto,
+  AbilityFactory,
 } from './common';
+import { ClsService } from 'nestjs-cls';
 
 function initializeFirebase() {
   const logger = new Logger('Firebase');
@@ -40,10 +43,15 @@ async function bootstrap() {
 
   const reflector = app.get(Reflector);
   const authService = app.get(AuthService);
-  app.useGlobalGuards(new AuthGuard(reflector, authService));
+  const abilityFactory = app.get(AbilityFactory);
+  const clsService = app.get(ClsService);
+  app.useGlobalGuards(
+    new AuthGuard(reflector, authService),
+    new PermissionGuard(reflector, abilityFactory, clsService),
+  );
 
-  const { httpAdapter } = app.get(HttpAdapterHost);
-  app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
+  const httpAdapterHost = app.get(HttpAdapterHost);
+  app.useGlobalFilters(new AllExceptionsFilter(httpAdapterHost));
 
   const config = new DocumentBuilder()
     .setTitle('Nest React RBAC API')

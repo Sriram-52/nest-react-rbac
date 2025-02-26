@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Tenant } from './tenant.entity';
 import { User } from './user.entity';
 
 export class Post {
@@ -27,11 +26,6 @@ export class Post {
     nullable: true,
   })
   updatedBy: string | null;
-  @ApiProperty({
-    type: () => Tenant,
-    required: false,
-  })
-  tenant?: Tenant;
   @ApiProperty({
     type: 'string',
   })

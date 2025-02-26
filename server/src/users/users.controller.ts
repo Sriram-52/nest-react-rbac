@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto, UserDto } from '@/prisma';
-import { ApiSuccessResponse, IsPublic } from '@/common';
+import { ApiSuccessResponse, CheckPermissions, IsPublic } from '@/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { ApiTags } from '@nestjs/swagger';
 
@@ -26,21 +26,25 @@ export class UsersController {
     return { message: 'User created successfully', result };
   }
 
+  @CheckPermissions(['read', 'User'])
   @Get()
   findAll() {
     return this.usersService.findAll();
   }
 
+  @CheckPermissions(['read', 'User'])
   @Get('me')
   findMe() {
     return this.usersService.findMe();
   }
 
+  @CheckPermissions(['read', 'User'])
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(id);
   }
 
+  @CheckPermissions(['update', 'User'])
   @ApiSuccessResponse(UserDto)
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
@@ -48,6 +52,7 @@ export class UsersController {
     return { message: 'User updated successfully', result };
   }
 
+  @CheckPermissions(['delete', 'User'])
   @ApiSuccessResponse()
   @Delete(':id')
   async remove(@Param('id') id: string) {

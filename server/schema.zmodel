@@ -53,17 +53,17 @@ plugin prisma {
 
 abstract model Base {
     id        String   @id @default(cuid()) @DtoReadOnly
-    createdAt DateTime @default(now()) @map('created_at') @DtoCreateHidden @DtoUpdateHidden
-    updatedAt DateTime @updatedAt @map('updated_at') @DtoCreateHidden @DtoUpdateHidden
-    createdBy String?  @map('created_by') @default(auth().id) @DtoCreateHidden @DtoUpdateHidden
-    updatedBy String?  @map('updated_by') @default(auth().id) @DtoCreateHidden @DtoUpdateHidden
+    createdAt DateTime @default(now()) @map('created_at') @DtoReadOnly
+    updatedAt DateTime @updatedAt @map('updated_at') @DtoReadOnly
+    createdBy String?  @map('created_by') @default(auth().id) @DtoReadOnly
+    updatedBy String?  @map('updated_by') @default(auth().id) @DtoReadOnly
 
     @@deny('all', auth() == null)
 }
 
 abstract model BaseWithTenant extends Base {
-    tenant   Tenant @relation(fields: [tenantId], references: [id])
-    tenantId String @map('tenant_id') @DtoCreateHidden @DtoUpdateHidden
+    tenant   Tenant @relation(fields: [tenantId], references: [id]) @DtoEntityHidden
+    tenantId String @map('tenant_id') @DtoReadOnly
 
     @@allow('all', tenant.users?[user == auth()])
 }
@@ -73,8 +73,10 @@ model Tenant extends Base {
     slug  String       @unique
     users TenantUser[] @DtoEntityHidden
     posts Post[]       @DtoEntityHidden
+    roles Role[]       @DtoEntityHidden
 
     @@map('tenant')
+    @@allow('all', users?[user == auth()])
 }
 
 model User extends Base {
@@ -82,8 +84,10 @@ model User extends Base {
     email   String       @unique @email @length(6, 32)
     posts   Post[]       @DtoEntityHidden
     tenants TenantUser[]
+    roles   RoleUser[]
 
     @@map('user')
+    @@allow('all', tenants?[tenant.users?[user == auth()]])
 }
 
 model TenantUser extends BaseWithTenant {
@@ -93,6 +97,50 @@ model TenantUser extends BaseWithTenant {
     @@unique([tenantId, userId])
     @@map('tenant_user')
 }
+
+
+model Permission extends Base {
+    action     String
+    subject    String
+    fields     String[]
+    conditions Json?
+    inverted   Boolean          @default(false)
+    reason     String?
+    roles      RolePermission[]
+
+    @@unique([action, subject])
+    @@map('permission')
+}
+
+model RolePermission extends Base {
+    role         Role       @relation(fields: [roleId], references: [id])
+    roleId       String     @map('role_id')
+    permission   Permission @relation(fields: [permissionId], references: [id])
+    permissionId String     @map('permission_id')
+
+    @@unique([roleId, permissionId])
+    @@map('role_permission')
+}
+
+model Role extends BaseWithTenant {
+    name        String
+    description String?
+    permissions RolePermission[]
+    users       RoleUser[]
+
+    @@map('role')
+}
+
+model RoleUser extends Base {
+    role   Role   @relation(fields: [roleId], references: [id])
+    roleId String @map('role_id')
+    user   User   @relation(fields: [userId], references: [id])
+    userId String @map('user_id')
+
+    @@unique([roleId, userId])
+    @@map('role_user')
+}
+
 
 model Post extends BaseWithTenant {
     title     String  @length(1, 256)

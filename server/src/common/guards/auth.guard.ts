@@ -6,6 +6,8 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthService } from '../services';
+import { IS_PUBLIC_KEY } from '../decorators';
+import { User } from '@/prisma';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -19,7 +21,7 @@ export class AuthGuard implements CanActivate {
       const request = context.switchToHttp().getRequest();
 
       const isPublic = this.reflector.get<boolean>(
-        'isPublic',
+        IS_PUBLIC_KEY,
         context.getHandler(),
       );
 

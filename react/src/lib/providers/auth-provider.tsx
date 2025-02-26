@@ -8,6 +8,7 @@ interface AuthContext {
 	isLoading: boolean;
 	signIn: (email: string, password: string) => Promise<void>;
 	signOut: () => Promise<void>;
+	setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const AuthContext = createContext<AuthContext | undefined>(undefined);
@@ -84,8 +85,9 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
 			isLoading,
 			signIn,
 			signOut,
+			setIsLoading,
 		}),
-		[user, isLoading, signIn, signOut],
+		[user, isLoading, signIn, signOut, setIsLoading],
 	);
 
 	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

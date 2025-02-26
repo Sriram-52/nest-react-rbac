@@ -8,6 +8,8 @@ import { BrowserRouter } from "react-router-dom";
 import "./lib/interceptor.ts";
 import { ErrorBoundary } from "react-error-boundary";
 import ErrorFallback from "./components/ui/error-boundary.tsx";
+import { AbilityProvider } from "./components/ui/can.tsx";
+import { AuthInjecter } from "./lib/auth-injector.tsx";
 
 const queryClient = new QueryClient({
 	mutationCache: new MutationCache({
@@ -27,11 +29,14 @@ createRoot(document.getElementById("root")!).render(
 	<StrictMode>
 		<ErrorBoundary FallbackComponent={ErrorFallback}>
 			<QueryClientProvider client={queryClient}>
-				<AuthProvider>
-					<BrowserRouter>
-						<App />
-					</BrowserRouter>
-				</AuthProvider>
+				<AbilityProvider>
+					<AuthProvider>
+						<BrowserRouter>
+							<App />
+							<AuthInjecter />
+						</BrowserRouter>
+					</AuthProvider>
+				</AbilityProvider>
 			</QueryClientProvider>
 		</ErrorBoundary>
 	</StrictMode>,

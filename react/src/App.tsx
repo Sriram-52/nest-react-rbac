@@ -8,6 +8,8 @@ import LoadingSpinner from "./components/ui/loading-spinner";
 import UnauthLayout from "./layout/unauth-layout";
 import AuthLayout from "./layout/auth-layout";
 import { Toaster } from "./components/ui/toaster";
+import { Can } from "./components/ui/can";
+import UnauthorizedPage from "./components/ui/unauthorized";
 
 function App() {
 	const { user, isLoading } = useAuth();
@@ -34,8 +36,22 @@ function App() {
 	return (
 		<AuthLayout>
 			<Routes>
-				{router.private.map(({ path, Component }) => (
-					<Route key={path} path={path} element={<Component />} />
+				{router.private.map(({ path, Component, ability }) => (
+					<Route
+						key={path}
+						path={path}
+						element={
+							ability ? (
+								<Can I={ability.action} a={ability.subject} passThrough>
+									{(allowed) => {
+										return allowed ? <Component /> : <UnauthorizedPage />;
+									}}
+								</Can>
+							) : (
+								<Component />
+							)
+						}
+					/>
 				))}
 				<Route path="/login" element={<Navigate to="/" replace />} />
 			</Routes>

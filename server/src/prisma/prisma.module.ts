@@ -9,7 +9,12 @@ import { enhance } from '@zenstackhq/runtime';
     ZenStackModule.registerAsync({
       useFactory: (prisma: PrismaService, cls: ClsService) => {
         return {
-          getEnhancedPrisma: () => enhance(prisma, { user: cls.get('auth') }),
+          getEnhancedPrisma: () =>
+            enhance(
+              prisma,
+              { user: cls.get('auth') },
+              { logPrismaQuery: process.env.ZENSTACK_DEBUG === 'true' },
+            ),
         };
       },
       inject: [PrismaService, ClsService],

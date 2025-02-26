@@ -7,11 +7,16 @@
 
 export * from "./createPostDto";
 export * from "./createUserDto";
+export * from "./permission";
+export * from "./permissionConditions";
 export * from "./postDto";
 export * from "./postsControllerCreate201";
 export * from "./postsControllerCreate201AllOf";
 export * from "./postsControllerUpdate200";
 export * from "./postsControllerUpdate200AllOf";
+export * from "./role";
+export * from "./rolePermission";
+export * from "./roleUser";
 export * from "./successResponseDto";
 export * from "./tenant";
 export * from "./tenantUser";
@@ -23,3 +28,4 @@ export * from "./usersControllerCreate201";
 export * from "./usersControllerCreate201AllOf";
 export * from "./usersControllerUpdate200";
 export * from "./usersControllerUpdate200AllOf";
+export * from "./post";

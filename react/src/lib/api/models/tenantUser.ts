@@ -4,7 +4,6 @@
  * Nest React RBAC API
  * OpenAPI spec version: 1.0
  */
-import type { Tenant } from "./tenant";
 import type { User } from "./user";
 
 export interface TenantUser {
@@ -15,7 +14,6 @@ export interface TenantUser {
 	createdBy: string | null;
 	/** @nullable */
 	updatedBy: string | null;
-	tenant?: Tenant;
 	tenantId: string;
 	user?: User;
 	userId: string;
